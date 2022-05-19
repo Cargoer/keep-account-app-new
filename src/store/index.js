@@ -4,10 +4,8 @@ import Vuex from 'vuex'
 import Table from '@/api/airtable.js'
 Vue.use(Vuex);
 
-// var base = new Airtable({apiKey: 'keyZ4ydi5sz7NHOIZ'}).base('appG9EdnP5rg4pyp9');
-// var table = base('records_test'), savingTable = base('saving_test')
-const apiKey = 'keyZ4ydi5sz7NHOIZ'
-const baseKey = 'appG9EdnP5rg4pyp9'
+const apiKey = 'YOU_API_KEY'
+const baseKey = 'YOU_BASE_KEY'
 const recordsTableName = 'records_test'
 const savingTableName = 'saving_test'
 const savingId = 'recFolhzu0j0V2ADk' // test

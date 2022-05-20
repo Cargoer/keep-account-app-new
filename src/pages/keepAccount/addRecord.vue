@@ -1,61 +1,89 @@
 <template>
   <view class="add-record fc">
-    <view class="tabbar">
-      <button @click="switchRecordType('支出')" class="button" :class="{active: recordType == '支出'}">支出</button>
-      <button @click="switchRecordType('收入')" class="button" :class="{active: recordType == '收入'}">收入</button>
+    <view class="tabbar fr">
+      <view @click="switchRecordType('支出')" class="button" :class="{active: recordType == '支出'}">支出</view>
+      <view @click="switchRecordType('收入')" class="button" :class="{active: recordType == '收入'}">收入</view>
     </view>
 
-    <uni-datetime-picker
-      type="date"
-      :value="showDate"
-      @change="onSelectDate"
-    ></uni-datetime-picker>
+    <view class="top-area fr">
+      <view class="date-picker-area fr">
+        <uni-icons type="calendar" size="40" color="#fff" @click="pickDate"></uni-icons>
+        <uni-datetime-picker
+          type="date"
+          :value="showDate"
+          @change="onSelectDate"
+          ref="dateTimePicker"
+          class="date-time-picker"
+        ></uni-datetime-picker>
+      </view>
+
+      <view class="amt-input-area fr">
+        <view class="amt">
+          {{amount}}
+        </view>
+        <view class="placeholder" v-if="amount == ''">输入收支金额</view>
+      </view>
+    </view>
+    
 
     <view class="choose-category choose">
-      <label>收支类别 - {{category? category: '请选择'}} </label>
+      <view class="title">收支类别</view>
       <!-- <el-viewider content-position="left">收支类别 - {{category? category: '请选择'}}</el-viewider> -->
-      <view class="fr">
+      <view class="choices fr">
         <view
           v-for="(item, index) in (recordType == '支出'? expenseEnumeration: incomeEnumeration)"
           :key="index"
           @click="setCategory(item.value)"
-          :class="['chooseIcon', 'fc', {chosen: category == item.value}]"
+          :class="['choice', 'fc', {chosen: category == item.value}]"
         >
-          <i :class="'el-icon-'+item.icon"></i>
-          <view>{{item.name}}</view>
+          <view v-if="item.icon">
+            <uni-icons :type="item.icon" size="30" :color="iconColor(item.value)" class="icon"></uni-icons>
+          </view>
+          <view v-else>
+            <view class="icon default">{{ firstLetterOfName(item.name) }}</view>
+          </view>
+          <view class="name">{{item.name}}</view>
         </view>
       </view>
     </view>
     <view class="choose-account choose">
-      <label>收支账户 - {{accountType? accountType: '请选择'}} </label>
-      <view class="fr">
+      <view class="title">收支账户</view>
+      <view class="choices fr">
         <view
           v-for="(item, index) in accountEnumeration"
           :key="index"
           @click="setAccount(item.value)"
-          :class="['chooseIcon', {chosen: accountType == item.value}]"
+          :class="['choice', 'fc', {chosen: accountType == item.value}]"
         >
-          <!-- <svg class="icon" aria-hidden="true">
-            <use :xlink:href="'#'+item.icon"></use>
-          </svg> -->
-          <view>{{item.name}}</view>
+          <view v-if="item.icon">
+            <uni-icons :type="item.icon" size="30" :color="iconColor(item.value)" class="icon"></uni-icons>
+          </view>
+          <view v-else>
+            <view class="icon default">{{ firstLetterOfName(item.name) }}</view>
+          </view>
+          <view class="name">{{item.name}}</view>
         </view>
       </view>
     </view>
-    <view class="input-amount fc">
+    <!-- <view class="input-amount fc">
       <label>内容 <input type="text" class="long-text-input" v-model="content" @focus="toggleKeyboard()"></label>
       <label>金额 <input type="text" class="number-input" v-model="amount"></label>
+    </view> -->
+    <view class="input-content-area fr">
+      <view class="txt">输入备注</view>
+      <input class="content-input" type="text" v-model="content">
     </view>
-    <view class="op-buttons fr">
-      <button v-if="this.page == 'add'" class="op-button" @click="addRecord">添加</button>
-      <button v-if="this.page == 'detail'" class="op-button" @click="modifyRecord">修改</button>
-      <button v-if="this.page == 'detail'" class="op-button" @click="deleteRecord">删除</button>
-      <button class="op-button" @click="navBack">返回</button>
-    </view>
+    <!-- <view class="op-buttons fr">
+      <view v-if="this.page == 'add'" class="op-button" @click="addRecord">添加</view>
+      <view v-if="this.page == 'detail'" class="op-button" @click="modifyRecord">修改</view>
+      <view v-if="this.page == 'detail'" class="op-button" @click="deleteRecord">删除</view>
+      <view class="op-button" @click="navBack">返回</view>
+    </view> -->
     <inputKeyboard 
       ref="keyboard" 
       @amtInput="setAmtInput"
       @amtDelete="deleteAmtInput"
+      @submit="addRecord"
     />  
   </view>
 </template>
@@ -77,6 +105,8 @@ export default {
       formerAmount: '',
       formerAccountType: '',
 
+      // iconColor: '#555',
+
       // 控制字段
       isDetail: false, // 是否点击记录进入详情
     }
@@ -87,12 +117,20 @@ export default {
   computed: {
     ...mapState(["chosenDay", "curRecord"]),
     ...mapGetters(["expenseEnumeration", "incomeEnumeration", "accountEnumeration"]),
+    iconColor() {
+      return val => {
+        return (val == this.accountType || val == this.category)? "rgb(29, 156, 206)": "#555"
+      }
+    }
   },
   methods: {
     ...mapMutations(["setChosenDay"]),
     onSelectDate(val) {
       this.showDate = val
       this.setChosenDay(val)
+    },
+    pickDate() {
+      this.$refs.dateTimePicker.show()
     },
     switchRecordType(str) {
       this.recordType = str
@@ -110,6 +148,7 @@ export default {
       this.$store.commit("insert", record)
       uni.navigateBack()
     },
+    // TODO 日期也有可能改变
     modifyRecord() {
       let change = {
         amount: Number(this.amount),
@@ -142,9 +181,6 @@ export default {
     navBack() {
       uni.navigateBack()
     },
-    toggleKeyboard() {
-      this.$refs.keyboard.toggleKeyboard()
-    },
     setAmtInput(val) {
       console.log('set amt input:', val)
       this.amount += val
@@ -152,6 +188,9 @@ export default {
     deleteAmtInput() {
       console.log('delete amt input')
       this.amount = this.amount.slice(0, -1)
+    },
+    firstLetterOfName(name) {
+      return name[0] || '类'
     }
   },
   onLoad(e) {
@@ -180,84 +219,185 @@ export default {
 <style lang="scss">
 .fr {
     display: flex;
-    gap: 15rpx;
+    // gap: 15rpx;
+    align-items: center;
 }
 .fc {
     display: flex;
     flex-direction: column;
-    gap: 15rpx;
+    // gap: 15rpx;
     align-items: center;
 }
+:root {
+  --theme-color: lightblue;
+}
 .add-record {
-    max-width: 600rpx;
-    margin: 20rpx;
     border-radius: 10rpx;
     // box-shadow: 2rpx 2rpx 10rpx rgba(168, 155, 150, .8);
-    border-top: 5rpx solid rgb(245, 212, 102);
     overflow: auto;
     position: relative;
-    padding: 20rpx;
+    // padding: 20rpx;
+    min-height: 100vh;
+    // background-color: lightblue;
     .tabbar {
-        width: 100%;
+        // width: 100%;
         .button {
-            width: 45%;
-            height: 50rpx;
-            border-radius: 25rpx 0 0 25rpx;
-            background-color: rgb(164, 224, 248);
-            border: none;
-            outline: none;
-            color: #fff
+            width: 200rpx;
+            height: 60rpx;
+            border-radius: 10rpx 0 0 10rpx;
+            // background-color: rgb(83, 203, 250);
+            border: 1px solid rgb(83, 203, 250);
+            color: #333;
+            text-align: center;
+            line-height: 60rpx;
+            font-size: 28rpx;
         }
         .button:last-child {
-            border-radius: 0 25rpx 25rpx 0;
+            border-radius: 0 10rpx 10rpx 0;
         }
         .active {
             background-color: rgb(83, 203, 250);
-            transform: scale(1.05);
+            color: #fff;
+            // transform: scale(1.05);
         }
+    }
+    .top-area {
+      margin-top: 25rpx;
+      width: 100%;
+      height: 100rpx;
+      background-color: lightblue;
+      padding-left: 20rpx;
+      .date-picker-area {
+        height: 60rpx;
+        position: relative;
+        .date-time-picker {
+          position: absolute;
+          left: -1000rpx;
+        }
+      }
+      .amt-input-area {
+        background-color: #fff;
+        padding-left: 15rpx;
+        margin-left: 20rpx;
+        height: 60rpx;
+        width: 400rpx;
+        // border: 3px solid rgb(83, 203, 250);
+        border-radius: 12rpx;
+        .amt {
+          font-size: 34rpx;
+          line-height: 60rpx;
+          position: relative;
+          &::after {
+            width: 4rpx;
+            height: 40rpx;
+            background: #0B85FF;
+            position: absolute;
+            right: -1rpx;
+            top: 50%;
+            transform: translateY(-50%);
+            // float: right;
+            content: " ";
+            // margin-left: 1rpx;
+            animation: cursor-blinks 1.5s infinite steps(1, start);
+          }
+        }
+        .placeholder {
+          margin-left: 5rpx;
+          font-size: 28rpx;
+          color: #ccc;
+          line-height: 60rpx;
+        }
+      }
     }
     .choose {
-        width: 90%;
+        // width: 90%;
         position: relative;
-        padding: 15rpx 10rpx 5rpx;
-        border-top: 2rpx solid rgb(243, 215, 56);
+        // padding: 15rpx 10rpx 5rpx;
+        // border-top: 2rpx solid rgb(243, 215, 56);
         margin-top: 15rpx;
-        label {
-            position: absolute;
-            top: 0;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: #fff;
-            padding: 0 10rpx;
+        width: 100%;
+        .title {
+          font-size: 30rpx;
+          padding: 20rpx;
+          background-color: lightblue;
+          color: #fff;
         }
-        .chooseIcon {
+        .choices {
+          flex-wrap: wrap;
+          background-color: #fff;
+          padding-top: 20rpx;
+          padding-left: 20rpx;
+          .choice {
             box-sizing: border-box;
             cursor: pointer;
-            width: 4.2em;
-            i {
+            width: 120rpx;
+            height: 120rpx;
+            align-items: center;
+            .icon {
+              width: 60rpx;
+              height: 60rpx;
+              &.default {
+                border-radius: 100%;
+                border: 1px solid #555;
+                color: #555;
                 font-size: 30rpx;
+                text-align: center;
+                line-height: 60rpx;
+              } 
+            }
+            .name {
+              font-size: 26rpx;
+              margin-top: 10rpx;
             }
             &.chosen {
-                // background-color: #9fe;
-                border: 2rpx solid rgb(83, 203, 250);
-                border-radius: 4rpx;
+              .name {
+                color: rgb(29, 156, 206);
+              }
+              .default {
+                color: #fff;
+                background-color: rgb(29, 156, 206);
+                border: 1px solid rgb(29, 156, 206);
+              }
             }
+          }
+          
         }
     }
-    .input-amount {
-        width: 90%;
-        border-top: 2rpx solid rgb(243, 215, 56);
-        padding: 15rpx;
-        label {
-            width: 90%;
-        }
-        input {
-            width: 60%;
-            height: 25rpx;
-            border: 2rpx solid rgb(92, 143, 163);
-            border-radius: 8rpx;
-        }
+
+    .input-content-area {
+      height: 100rpx;
+      width: 100%;
+      position: fixed;
+      left: 0;
+      bottom: 400rpx;
+      border-top: 1px solid #555;
+      border-bottom: 1px solid #555;
+      .txt {
+        font-size: 32rpx;
+        line-height: 100rpx;
+        padding: 0 25rpx;
+        box-shadow: 5rpx 0 10rpx #555;
+      }
+      .content-input {
+        height: 60rpx;
+        margin-left: 25rpx;
+      }
     }
+}
+
+@keyframes cursor-blinks {
+  0% {
+    opacity: 1;
+    display: block;
+  }
+  50% {
+    opacity: 0;
+    display: none;
+  }
+  100% {
+    opacity: 1;
+    display: block;
+  }
 }
 
 .chooseIcon .icon {

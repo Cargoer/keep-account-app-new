@@ -30,7 +30,7 @@ export default {
       console.log("toDetail")
       this.setCurRecord(item)
       uni.navigateTo({
-        url: '/pages/keepAccount/addRecord?page=edit'
+        url: '/pages/keepAccount/addRecord?page=detail'
       })
     }
   }
@@ -41,24 +41,24 @@ export default {
 .fr {
   display: flex;
   align-items: center;
-  gap: 10rpx;
+  // gap: 10rpx;
 }
 .record-list {
   display: flex;
   flex-direction: column;
   /* align-items: center; */
-  padding: 15rpx 10rpx;
+  padding: 20rpx 30rpx;
   /* box-shadow: 1rpx 1rpx 2rpx gray; */
   box-sizing: border-box;
   width: 100%;
 
   .record {
-    width: 90%;
-    height: 80rpx;
+    // width: 90%;
+    height: 100rpx;
     position: relative;
-    border-bottom: 1rpx solid rgba(145, 145, 145, .6);
-    padding: auto 10rpx;
-    margin: 0 auto;
+    border-bottom: 1rpx solid #ccc;
+    // padding: auto 10rpx;
+    padding-left: 10rpx;
 
     .typeIcon {
       --type-icon-size: 25rpx;
@@ -66,7 +66,12 @@ export default {
       height: var(--type-icon-size);
       border: 1rpx solid black;
     }
+    .content {
+      margin-left: 25rpx;
+      font-size: 30rpx;
+    }
     .amount {
+      font-size: 30rpx;
       position: absolute;
       right: 10rpx;
     }

@@ -1,17 +1,20 @@
 <template>
   <view class="daily-records">
-    <view class="top">
+    <view class="top fr">
+      <uni-icons type="left" size="24" color="#ccc" @click="shiftDay(-1)"></uni-icons>
       <uni-datetime-picker
         type="date"
+        class="date-picker"
         :value="dateValue"
         @change="onSelectDate"
       ></uni-datetime-picker>
+      <uni-icons type="right" size="24" color="#ccc" @click="shiftDay(1)"></uni-icons>
       <view class="date-picker today" @click="toToday">今天</view>
       <!-- TODO 放在下面正中间 -->
-      <button class="add" @click="toAdd">+</button>
+      <view class="add" @click="toAdd">+</view>
     </view>
     
-    <view class="month-progress">
+    <view class="month-progress fr">
       <span>本月进度  </span>
       <view class="progress-bar">
         <!-- <el-progress 
@@ -19,15 +22,16 @@
           :stroke-width="26" 
           :percentage="Number(dayOfMonth)" >
         </el-progress> -->
+        <view class="progress-fill" :style="progressWidth"></view>
       </view>
     </view>
     <view class="summary">
-      <view class="summary-box">
+      <view class="summary-box fc">
         <label class="summary-text">今日收支</label>
         <view class="daily-total">￥{{dailyTotal}}</view>
       </view>
       <view class="vertical-line"></view>
-      <view class="summary-box">
+      <view class="summary-box fc">
         <label class="summary-text">剩余积蓄</label>
         <view class="remain-saving">￥{{savings.saving}}</view>
       </view>
@@ -35,8 +39,8 @@
     <RecordList />
     <Tabbar />
     
-    <button class="date-shift-button left" @click="shiftDay(-1)">&lt;</button>
-    <button class="date-shift-button right" @click="shiftDay(1)">&gt;</button>
+    <!-- <button class="date-shift-button left" @click="shiftDay(-1)">&lt;</button>
+    <button class="date-shift-button right" @click="shiftDay(1)">&gt;</button> -->
   </view>
 </template>
 
@@ -48,7 +52,6 @@ export default {
   data() {
     return {
       dateValue: '',
-      showCalendar: false,
     }
   },
   components: {
@@ -58,11 +61,12 @@ export default {
   computed: {
     ...mapState(["savings", "chosenDay", "recordsTable", "savingTable"]),
     ...mapGetters(['dailyTotal']),
-    dayOfMonth() {
+    progressWidth() {
       let now = new Date(),
           day = now.getDate(),
           totalDay = new Date(now.getFullYear(), now.getMonth()+1, 0).getDate()
-      return Number(day / totalDay * 100).toFixed(1)
+      let percentage = Number(day / totalDay).toFixed(2)
+      return `width: ${Math.floor(550 * percentage)}rpx`
     }
   },
   methods: {
@@ -128,10 +132,6 @@ export default {
       console.log("dateValue after shift:", this.dateValue)
       this.queryRecordList(this.dateValue)
     },
-
-    progressFormat(percentage) {
-      return `本月进度 ${Math.round(percentage)}%`
-    }
   },
   created() {
     console.log("DailyRecord created!")
@@ -144,50 +144,58 @@ export default {
 </script>
 
 <style lang="scss">
+.fr {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+}
+.fc {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
 .daily-records {
   display: flex;
   flex-direction: column;
   gap: 15rpx;
   // max-width: 600rpx;
-  min-height: 80vh;
-  // margin: 20rpx;
-  border-radius: 10rpx;
-  // box-shadow: 2rpx 2rpx 10rpx rgba(168, 155, 150, .8);
-  border-top: 5rpx solid rgb(245, 212, 102);
+  // min-height: 80vh;
   overflow: auto;
   position: relative;
-  padding: 20rpx;
+  padding: 25rpx;
+  min-height: 100vh;
+  // background-color: lightblue;
 }
 .top {
     width: 100%;
     display: flex;
     gap: 10rpx;
+    background-color: #fff;
     .date-picker {
         max-width: 300rpx;
-        // cursor: pointer;
-    }
-    .today-button {
-        max-width: 100rpx;
-        border: none;
+        height: 80rpx;
         cursor: pointer;
-        border-radius: 6rpx;
+        // cursor: pointer;
+        &.today {
+          height: 80rpx;
+          padding: 0 20rpx;
+          font-size: 28rpx;
+          line-height: 80rpx;
+          border-radius: 8rpx;
+          border: 1px solid #ccc;
+        }
     }
     .add {
         cursor: pointer;
-        --size: 60rpx;
+        --size: 80rpx;
         width: var(--size);
         height: var(--size);
         border-radius: 50%;
         font-size: 50rpx;
         text-align: center;
         line-height: var(--size);
-        outline: none;
-        border: none;
-        box-shadow: 1rpx 1rpx 1rpx 1rpx lightblue;
-
-        position: absolute;
-        top: 20rpx;
-        right: 20rpx;
+        border: 1px solid #ccc;
+        box-shadow: 1rpx 1rpx 1rpx lightblue;
         
         transition: .3s;
         &:hover {
@@ -198,17 +206,29 @@ export default {
 
 .month-progress {
     margin-top: 15rpx;
+    border-radius: 8rpx;
+    // border: 1px solid #ccc;
+    height: 60rpx;
+    background-color: #fff;
     span {
-        margin-right: 10rpx;
+        margin-right: 25rpx;
+        font-size: 28rpx;
     }
     .progress-bar {
-        width: 70%;
-        display: inline-block;
+        width: 550rpx;
+        height: 30rpx;
+        border-radius: 15rpx;
+        border: 1px solid rgb(83, 203, 250);
+        .progress-fill {
+          background-color: rgb(83, 203, 250);
+          border-radius: 15rpx;
+          height: 100%;
+        }
     }
 }
 
 .summary {
-    height: 85rpx;
+    height: 100rpx;
     margin-top: 15rpx;
     padding: 8rpx;
     display: flex;
@@ -216,40 +236,15 @@ export default {
     align-items: center;
     border-radius: 6rpx;
     box-shadow: 1rpx 2rpx 10rpx rgb(130, 163, 173);
+    background-color: #fff;
     .summary-box {
         width: 45%;
         display: flex;
         flex-direction: column;
         justify-content: center;
         gap: 8rpx;
+        font-size: 30rpx;
     }
-}
-
-
-
-.date-shift-button {
-    width: 40rpx;
-    height: 100rpx;
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    border: none;
-    border-radius: 0 10rpx 10rpx 0;
-    transition: .5s;
-}
-.left {
-    left: 0;
-}
-.right {
-    right: 0;
-    border-radius: 10rpx 0 0 10rpx;
-}
-.date-shift-button:hover {
-    /* border: 1rpx solid rgba(50,50,50,.5); */
-    box-shadow: 2rpx 2rpx 5rpx rgba(10,50,50,.5);
-}
-.right:hover {
-    box-shadow: -2rpx 2rpx 5rpx rgba(10,50,50,.5);
 }
 .vertical-line {
     height: 75%;

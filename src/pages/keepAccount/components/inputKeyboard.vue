@@ -1,5 +1,5 @@
 <template>
-    <view v-if="keyboardPopup" class="keyboard fr">
+    <view class="keyboard fr">
         <view class="left num-area fc">
             <view 
                 v-for="(nums, index) in numbers" 
@@ -44,6 +44,9 @@ export default {
         },
         toggleKeyboard() {
             this.keyboardPopup = !this.keyboardPopup
+        },
+        confirmAmtInput() {
+          this.$emit("submit")
         }
     }
 }
@@ -62,37 +65,56 @@ export default {
     line-height: $lineHeight;
 }
 .keyboard {
-    --single-height: 30rpx;
-    width: 90%;
-    height: calc(var(--single-height) * 4);
+    --single-height: 100rpx;
+    width: 100%;
+    height: 400rpx;
+    position: fixed;
+    left: 0;
+    bottom: 0;
     .left {
-        flex: 2;
+      // flex: 2;
+      width: 75%;
+      .line {
+        flex: 1;
         .number {
-            flex: 1;
-            // height: var(--single-height);
-            // line-height: var(--height);
-            // text-align: center;
-            @include setTextCenter(var(--single-height));
-        }
-        .zero {
+          flex: 1;
+          
+          // height: var(--single-height);
+          // line-height: var(--single-height);
+          // text-align: center;
+          border-right: 1px solid #ccc;
+          border-bottom: 1px solid #ccc;
+          @include setTextCenter(var(--single-height));
+          &.zero {
             flex: 2;
+            border-bottom: none;
+          }
+          &.dot {
+            border-bottom: none;
+          }
         }
+      }
     }
     .right {
-        flex: 1;
+        // flex: 1;
+        width: 25%;
         .operator {
             width: 100%;
+            &.delete {
+              flex: 1;
+              // height: var(--single-height);
+              // line-height: var(--single-height);
+              // text-align: center;
+              @include setTextCenter(var(--single-height));
+            }
+            &.confirm {
+              flex: 3;
+              @include setTextCenter(calc(var(--single-height) * 3));
+              color: #fff;
+              background-color: rgb(243, 157, 60);
+            }
         }
-        .delete {
-            flex: 1;
-            @include setTextCenter(var(--single-height));
-        }
-        .confirm {
-            flex: 3;
-            @include setTextCenter(calc(var(--single-height) * 3));
-            color: #fff;
-            background-color: rgb(243, 157, 60);
-        }
+        
     }
 }
 </style>

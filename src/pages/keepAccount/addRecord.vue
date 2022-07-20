@@ -31,7 +31,7 @@
       <!-- <el-viewider content-position="left">收支类别 - {{category? category: '请选择'}}</el-viewider> -->
       <view class="choices fr">
         <view
-          v-for="(item, index) in (recordType == '支出'? expenseEnumeration: incomeEnumeration)"
+          v-for="(item, index) in recordEnumeration"
           :key="index"
           @click="setCategory(item.value)"
           :class="['choice', 'fc', {chosen: category == item.value}]"
@@ -121,6 +121,9 @@ export default {
       return val => {
         return (val == this.accountType || val == this.category)? "rgb(29, 156, 206)": "#555"
       }
+    },
+    recordEnumeration() {
+      return (this.recordType == '支出'? this.expenseEnumeration: this.incomeEnumeration)
     }
   },
   methods: {

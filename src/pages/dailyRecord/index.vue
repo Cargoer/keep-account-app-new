@@ -15,7 +15,7 @@
     </view>
     
     <view class="month-progress fr">
-      <span>本月进度  </span>
+      <span class="txt">本月进度  </span>
       <view class="progress-bar">
         <!-- <el-progress 
           :text-inside="true" 
@@ -38,16 +38,17 @@
     </view>
     <RecordList />
     <Tabbar />
-    
-    <!-- <button class="date-shift-button left" @click="shiftDay(-1)">&lt;</button>
-    <button class="date-shift-button right" @click="shiftDay(1)">&gt;</button> -->
   </view>
 </template>
 
+File name 'd:/note/practice/keep-account-app-final-ver/src/pages/dailyRecord/components/recordList.vue' 
+differs from already included file name 'd:/note/practice/keep-account-app-final-ver/src/pages/dailyRecord/components/RecordList.vue' 
+only in casing.
+
 <script>
-import RecordList from './components/RecordList.vue'
+import RecordList from './components/recordList'
 import { mapState, mapGetters, mapMutations } from 'vuex'
-import Tabbar from './components/tabbar.vue'
+import Tabbar from '@/components/tabbar.vue'
 export default {
   data() {
     return {
@@ -121,7 +122,7 @@ export default {
     toAdd() {
       console.log("to add!")
       uni.navigateTo({
-        url: '/pages/keepAccount/addRecord?page=add'
+        url: '/pages/addRecord/index?page=add'
       })
     },
 
@@ -133,7 +134,7 @@ export default {
       this.queryRecordList(this.dateValue)
     },
   },
-  created() {
+  onLoad() {
     console.log("DailyRecord created!")
     this.dateValue = new Date().toISOString().split('T')[0]
     this.queryRecordList(this.dateValue)
@@ -210,7 +211,7 @@ export default {
     // border: 1px solid #ccc;
     height: 60rpx;
     background-color: #fff;
-    span {
+    .txt {
         margin-right: 25rpx;
         font-size: 28rpx;
     }

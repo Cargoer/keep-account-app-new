@@ -372,7 +372,10 @@ export default {
       width: 100%;
       position: fixed;
       left: 0;
-      bottom: 400rpx;
+      bottom: constant(safe-area-inset-bottom);
+	    bottom: env(safe-area-inset-bottom);
+      // bottom: 400rpx;
+      margin-bottom: 400rpx;
       border-top: 1px solid #555;
       border-bottom: 1px solid #555;
       .txt {

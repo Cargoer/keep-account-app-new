@@ -30,7 +30,7 @@ export default {
       console.log("toDetail")
       this.setCurRecord(item)
       uni.navigateTo({
-        url: '/pages/keepAccount/addRecord?page=detail'
+        url: '/pages/addRecord/index?page=detail'
       })
     }
   }

@@ -8,13 +8,13 @@
   
   "pages": [
 		{
-			"path": "pages/keepAccount/dailyRecord",
+			"path": "pages/dailyRecord/index",
 			"style": {
 				"navigationBarTitleText": "我的记账"
 			}
 		},
     {
-			"path": "pages/keepAccount/addRecord",
+			"path": "pages/addRecord/index",
 			"style": {
 				"navigationBarTitleText": "记账"
 			}

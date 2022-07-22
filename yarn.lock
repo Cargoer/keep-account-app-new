@@ -1807,9 +1807,9 @@
   "version" "17.0.34"
 
 "@types/node@>=8.0.0 <15":
-  "integrity" "sha512-B9EoJFjhqcQ9OmQrNorItO+OwEOORNn3S31WuiHvZY/dm9ajkB7AKD/8toessEtHHNL+58jofbq7hMMY9v4yig=="
-  "resolved" "https://registry.npmmirror.com/@types/node/-/node-14.18.18.tgz"
-  "version" "14.18.18"
+  "integrity" "sha512-qzaYbXVzin6EPjghf/hTdIbnVW1ErMx8rPzwRNJhlbyJhu2SyqlvjGOY/tbUt6VFyzg56lROcOeSQRInpt63Yw=="
+  "resolved" "https://registry.npmmirror.com/@types/node/-/node-14.18.22.tgz"
+  "version" "14.18.22"
 
 "@types/normalize-package-data@^2.4.0":
   "integrity" "sha512-Gj7cI7z+98M282Tqmp2K5EIsoouUEzbBJhQQzDE3jSIRk6r9gsz0oUokqIUR4u1R3dMHo0pDHM7sNOHyhulypw=="

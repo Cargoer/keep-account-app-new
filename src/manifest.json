@@ -6,7 +6,6 @@
     "versionCode" : "100",
     "transformPx" : false,
     "app-plus" : {
-        /* 5+App特有相关 */
         "usingComponents" : true,
         "splashscreen" : {
             "alwaysShowBeforeRender" : true,
@@ -15,11 +14,8 @@
             "delay" : 0
         },
         "modules" : {},
-        /* 模块配置 */
         "distribute" : {
-            /* 应用发布信息 */
             "android" : {
-                /* android打包配置 */
                 "permissions" : [
                     "<uses-feature android:name=\"android.hardware.camera\"/>",
                     "<uses-feature android:name=\"android.hardware.camera.autofocus\"/>",
@@ -37,7 +33,6 @@
                 ]
             },
             "ios" : {},
-            /* ios打包配置 */
             "sdkConfigs" : {
                 "ad" : {}
             },
@@ -48,19 +43,16 @@
             }
         }
     },
-    /* SDK配置 */
     "quickapp" : {},
-    /* 快应用特有相关 */
     "mp-weixin" : {
-        /* 微信小程序特有相关 */
-        "appid" : "wxdcf00ca386a31f7b",
+        "appid" : "wx400e34cf1cb65a44",
         "setting" : {
             "urlCheck" : false
         },
         "usingComponents" : true
     },
     "mp-alipay" : {
-        "appid" : "2021003130670864",
+        "appid" : "",
         "usingComponents" : true
     },
     "mp-baidu" : {

@@ -10,17 +10,20 @@ export default class Table {
   // 获取airtable表记录
   getRecords(filterFormula = "") {
     return new Promise((resolve, reject) => {
-      console.log("filterFormula in getRecords:", filterFormula, typeof filterFormula)
+      console.log("filterFormula in getRecords:", filterFormula)
       let recordList = []
+      console.log("this.table:", this.table)
       this.table
         .select({
           view: "Grid view",
           filterByFormula: filterFormula,
         })
         .eachPage(function Page(records, fetchNextPage) {
+          console.log("eachPage")
           recordList = [...recordList, ...records.map(item => item.fields)]
           fetchNextPage()
         }, function done(err) {
+          console.log("done err:", err)
           err? reject(err): resolve(recordList)
         })
     })

@@ -2,7 +2,7 @@
   <view class="record-list">
     <view v-for="(item, index) in records" :key="index">
       <view class="record fr" @click="toDetail(item)">
-        <view class="typeIcon"></view>
+        <view class="typeIcon">{{ item.category[0] }}</view>
         <view class="content">{{item.content?item.content: item.category}}</view>
         <view class="amount">
           {{signOfRecord(item)}}￥{{item.amount}}
@@ -61,10 +61,14 @@ export default {
     padding-left: 10rpx;
 
     .typeIcon {
-      --type-icon-size: 25rpx;
+      --type-icon-size: 50rpx;
       width: var(--type-icon-size);
       height: var(--type-icon-size);
       border: 1rpx solid black;
+      border-radius: 100%;
+      line-height: var(--type-icon-size);
+      text-align: center;
+      font-size: 28rpx;
     }
     .content {
       margin-left: 25rpx;

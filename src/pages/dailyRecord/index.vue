@@ -28,12 +28,12 @@
     <view class="summary">
       <view class="summary-box fc">
         <label class="summary-text">今日收支</label>
-        <view class="daily-total">￥{{dailyTotal}}</view>
+        <view class="daily-total">￥{{dailyTotal.toFixed(2)}}</view>
       </view>
       <view class="vertical-line"></view>
       <view class="summary-box fc">
         <label class="summary-text">剩余积蓄</label>
-        <view class="remain-saving">￥{{savings.saving}}</view>
+        <view class="remain-saving">￥{{savings.saving.toFixed(2)}}</view>
       </view>
     </view>
     <RecordList />
@@ -41,14 +41,11 @@
   </view>
 </template>
 
-File name 'd:/note/practice/keep-account-app-final-ver/src/pages/dailyRecord/components/recordList.vue' 
-differs from already included file name 'd:/note/practice/keep-account-app-final-ver/src/pages/dailyRecord/components/RecordList.vue' 
-only in casing.
-
 <script>
 import RecordList from './components/recordList'
 import { mapState, mapGetters, mapMutations } from 'vuex'
 import Tabbar from '@/components/tabbar.vue'
+import { getTableRecords } from '@/api/airtableRequest.js'
 export default {
   data() {
     return {
@@ -84,11 +81,11 @@ export default {
       
       let filterFormula = `IS_SAME({createTime}, "${curDate}") = 1`
       console.log("filterFormula:", filterFormula)
-      this.recordsTable.getRecords(filterFormula)
-        .then(records => {
-          console.log("get records res:", records)
+      getTableRecords("records", filterFormula)
+        .then(res => {
+          console.log("get records res:", res)
           // state.records = records
-          this.setRecords(records)
+          this.setRecords(res.records.map(item => item.fields))
           uni.hideLoading()
         })
         .catch(err => {
@@ -99,10 +96,10 @@ export default {
 
     // 初始化积蓄信息
     querySavings() {
-      this.savingTable.getRecords()
-        .then(records => {
-          console.log("get savings res:", records)
-          this.setSavings(records[0])
+      getTableRecords("saving")
+        .then(res => {
+          console.log("get savings res:", res)
+          this.setSavings(res.records.map(item => item.fields)[0])
         })
         .catch(err => {
           console.error("get savings err:", err)

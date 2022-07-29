@@ -1,3 +1,7 @@
+/**
+ * 引入airtable包，对airtable进行操作
+ */
+
 import Airtable from 'airtable'
 
 export default class Table {

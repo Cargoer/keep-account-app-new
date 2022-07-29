@@ -25,10 +25,8 @@
       </view>
     </view>
     
-
     <view class="choose-category choose">
       <view class="title">收支类别</view>
-      <!-- <el-viewider content-position="left">收支类别 - {{category? category: '请选择'}}</el-viewider> -->
       <view class="choices fr">
         <view
           v-for="(item, index) in recordEnumeration"
@@ -46,6 +44,7 @@
         </view>
       </view>
     </view>
+
     <view class="choose-account choose">
       <view class="title">收支账户</view>
       <view class="choices fr">
@@ -65,20 +64,11 @@
         </view>
       </view>
     </view>
-    <!-- <view class="input-amount fc">
-      <label>内容 <input type="text" class="long-text-input" v-model="content" @focus="toggleKeyboard()"></label>
-      <label>金额 <input type="text" class="number-input" v-model="amount"></label>
-    </view> -->
     <view class="input-content-area fr">
       <view class="txt">输入备注</view>
       <input class="content-input" type="text" v-model="content">
     </view>
-    <!-- <view class="op-buttons fr">
-      <view v-if="this.page == 'add'" class="op-button" @click="addRecord">添加</view>
-      <view v-if="this.page == 'detail'" class="op-button" @click="modifyRecord">修改</view>
-      <view v-if="this.page == 'detail'" class="op-button" @click="deleteRecord">删除</view>
-      <view class="op-button" @click="navBack">返回</view>
-    </view> -->
+
     <inputKeyboard 
       ref="keyboard" 
       @amtInput="setAmtInput"
@@ -379,9 +369,12 @@ export default {
       border-top: 1px solid #555;
       border-bottom: 1px solid #555;
       .txt {
+        height: 100rpx;
+        width: 210rpx;
         font-size: 32rpx;
         line-height: 100rpx;
-        padding: 0 25rpx;
+        // padding: 0 25rpx;
+        text-align: center;
         box-shadow: 5rpx 0 10rpx #555;
       }
       .content-input {

@@ -1,21 +1,16 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import Table from '@/api/airtable.js'
-import { getTableRecords, addRecord, updateRecord } from '@/api/airtableRequest.js'
-Vue.use(Vuex);
+import { 
+  getTableRecords, 
+  addRecord, 
+  updateRecord 
+} from '@/api/airtableRequest.js'
+import table from '@/utils/globalConfig.js'
 
-let isTest = process.env.CUSTOM_ENV === 'test'
-const apiKey = ''
-const baseKey = ''
-const recordsTableName = `records${isTest? '_test': ''}`
-const savingTableName = `saving${isTest? '_test': ''}`
-const savingId = isTest? 'recFolhzu0j0V2ADk': 'reca22Hd66BFUBolR'
+Vue.use(Vuex);
 
 const store = new Vuex.Store({
   state: {
-    recordsTable: new Table(apiKey, baseKey, recordsTableName),
-    savingTable: new Table(apiKey, baseKey, savingTableName),
-    enumerationTable: new Table(apiKey, baseKey, "enumeration"),
     // 可变项
     records: [],
     chosenDay: new Date(),
@@ -68,17 +63,29 @@ const store = new Vuex.Store({
       state.savings = savings
     },
     insert(state, record) {
-      addRecord('records', record).then(res => {
-      // state.recordsTable.addRecord(record).then(id => {
+      addRecord(table.recordsTable, record).then(res => {
         let record = res.data.records[0]
         let {id, fields} = record
-        updateRecord('records', id, {id, ...fields})
+        updateRecord(table.recordsTable, id, {id, ...fields})
         record.id = id
         state.records.unshift(record)
+
         // 更新积蓄
         var delta = record.recordType == '支出'? (-record.amount): record.amount
+        /** 判断账户类型
+         * 1. 微信（余额大于支出，直接扣除，否则要加上cmb的扣除）
+         * 2. 支付宝（同微信）
+         * 3. cmb正常扣除
+         * 4. 现金正常扣除
+         * 5. abc正常扣除
+         * 6. 若上述规则余额均不足，驳回并警告
+         */
         state.savings.saving += delta
         state.savings[record.accountType] += delta
+        updateRecord(table.savingTable, table.savingTableId, {
+          id: table.savingTableId,
+          ...state.savings,
+        })
         // state.savingTable.updateRecord(savingId, {
         //   [record.accountType]: state.savings[record.accountType]
         // }).catch(err => {
@@ -97,7 +104,7 @@ const store = new Vuex.Store({
         return item
       })
       console.log("payLoad after:", payload)
-      updateRecord("records", payload.id, payload.change)
+      updateRecord(table.recordsTable, payload.id, payload.change)
         .catch(err => {
           console.error("update-record err:", err)
         })
@@ -145,28 +152,11 @@ const store = new Vuex.Store({
       // }
     },
     delete(state, ids) {
-      state.records = state.records.filter(item => {
-        return ids.indexOf(item.id) === -1
-      })
-      state.recordsTable.deleteRecord(ids)
-        .then(deletedRecords => {
-          deletedRecords.forEach((item) => {
-            state.savings.saving -= item.amount
-            state.savings[item.accountType] -= item.amount
-            state.savingTable.updateRecord(savingId, {
-              [item.accountType]: state.savings[item.accountType]
-            }).catch(err => {
-              console.error("update-saving err:", err)
-            })
-          })
-        })
-        .catch(err => {
-          console.error("delete err:", err)
-        })
+      
     },
     initEnumeration(state) {
       // 初始化枚举信息
-      getTableRecords("enumeration")
+      getTableRecords(table.enumTable)
         .then(res => {
           state.enumeration = res.records.map(item => item.fields)
         })

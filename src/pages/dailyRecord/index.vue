@@ -46,6 +46,8 @@ import RecordList from './components/recordList'
 import { mapState, mapGetters, mapMutations } from 'vuex'
 import Tabbar from '@/components/tabbar.vue'
 import { getTableRecords } from '@/api/airtableRequest.js'
+import table from '@/utils/globalConfig.js'
+
 export default {
   data() {
     return {
@@ -57,8 +59,13 @@ export default {
     Tabbar,
   },
   computed: {
-    ...mapState(["savings", "chosenDay", "recordsTable", "savingTable"]),
-    ...mapGetters(['dailyTotal']),
+    ...mapState([
+      "savings", 
+      "chosenDay", 
+    ]),
+    ...mapGetters([
+      'dailyTotal'
+    ]),
     progressWidth() {
       let now = new Date(),
           day = now.getDate(),
@@ -68,23 +75,24 @@ export default {
     }
   },
   methods: {
-    ...mapMutations(["setChosenDay", "setRecords", "setSavings", "initEnumeration"]),
+    ...mapMutations([
+      "setChosenDay", 
+      "setRecords", 
+      "setSavings", 
+      "initEnumeration"
+    ]),
+
     // 初始化收支记录
     queryRecordList(date) {
       uni.showLoading({
         title: '加载中'
       })
       this.setChosenDay(date)
-      let curDate = date
-      // curDate.setHours(curDate.getHours() + 8)
-      // console.log("iso:", curDate.toISOString().split('T')[0])
       
-      let filterFormula = `IS_SAME({createTime}, "${curDate}") = 1`
-      console.log("filterFormula:", filterFormula)
-      getTableRecords("records", filterFormula)
+      let filterFormula = `IS_SAME({createTime}, "${date}") = 1`
+      getTableRecords(table.recordsTable, filterFormula)
         .then(res => {
           console.log("get records res:", res)
-          // state.records = records
           this.setRecords(res.records.map(item => item.fields))
           uni.hideLoading()
         })
@@ -93,10 +101,9 @@ export default {
           uni.hideLoading()
         })
     },
-
     // 初始化积蓄信息
     querySavings() {
-      getTableRecords("saving")
+      getTableRecords(table.savingTable)
         .then(res => {
           console.log("get savings res:", res)
           this.setSavings(res.records.map(item => item.fields)[0])
@@ -106,13 +113,20 @@ export default {
         })
     },
 
-    onSelectDate(val) {
+    // 更改日期的三种方式
+    onSelectDate(val) {  // 日历选择
       this.dateValue = val
       this.queryRecordList(val)
     },
-
-    toToday() {
+    toToday() {  // 回到今天
       this.dateValue = new Date().toISOString().split('T')[0]
+      this.queryRecordList(this.dateValue)
+    },
+    shiftDay(n) {  // 前后增加天数
+      let tempDate = new Date(this.dateValue)
+      tempDate.setDate(tempDate.getDate() + n)
+      this.dateValue = tempDate.toISOString().split('T')[0]
+      console.log("dateValue after shift:", this.dateValue)
       this.queryRecordList(this.dateValue)
     },
 
@@ -122,15 +136,8 @@ export default {
         url: '/pages/addRecord/index?page=add'
       })
     },
-
-    shiftDay(n) {
-      let tempDate = new Date(this.dateValue)
-      tempDate.setDate(tempDate.getDate() + n)
-      this.dateValue = tempDate.toISOString().split('T')[0]
-      console.log("dateValue after shift:", this.dateValue)
-      this.queryRecordList(this.dateValue)
-    },
   },
+  
   onLoad() {
     console.log("DailyRecord created!")
     this.dateValue = new Date().toISOString().split('T')[0]

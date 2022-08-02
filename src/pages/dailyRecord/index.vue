@@ -17,27 +17,25 @@
     <view class="month-progress fr">
       <span class="txt">本月进度  </span>
       <view class="progress-bar">
-        <!-- <el-progress 
-          :text-inside="true" 
-          :stroke-width="26" 
-          :percentage="Number(dayOfMonth)" >
-        </el-progress> -->
         <view class="progress-fill" :style="progressWidth"></view>
       </view>
     </view>
     <view class="summary">
       <view class="summary-box fc">
         <label class="summary-text">今日收支</label>
-        <view class="daily-total">￥{{dailyTotal.toFixed(2)}}</view>
+        <view class="daily-total" v-if="!isSecret">￥{{dailyTotal.toFixed(2)}}</view>
+        <view class="daily-total" v-else>*****</view>
       </view>
       <view class="vertical-line"></view>
       <view class="summary-box fc">
         <label class="summary-text">剩余积蓄</label>
-        <view class="remain-saving">￥{{savings.saving.toFixed(2)}}</view>
+        <view class="remain-saving" v-if="!isSecret">￥{{savings.saving.toFixed(2)}}</view>
+        <view class="remain-saving" v-else>*****</view>
       </view>
     </view>
     <RecordList />
     <Tabbar />
+    <view :class="['set-secret-btn', {'active': isSecret}]" @click="toggleIsSecret">隐私模式</view>
   </view>
 </template>
 
@@ -62,6 +60,7 @@ export default {
     ...mapState([
       "savings", 
       "chosenDay", 
+      "isSecret"
     ]),
     ...mapGetters([
       'dailyTotal'
@@ -79,7 +78,8 @@ export default {
       "setChosenDay", 
       "setRecords", 
       "setSavings", 
-      "initEnumeration"
+      "toggleIsSecret",
+      "initEnumeration",
     ]),
 
     // 初始化收支记录
@@ -137,7 +137,7 @@ export default {
       })
     },
   },
-  
+
   onLoad() {
     console.log("DailyRecord created!")
     this.dateValue = new Date().toISOString().split('T')[0]
@@ -255,5 +255,17 @@ export default {
     height: 75%;
     width: 3rpx;
     background: rgb(104, 156, 172);
+}
+.set-secret-btn {
+  position: fixed;
+  bottom: 30rpx;
+  right: 25rpx;
+  padding: 10rpx;
+  border: 1px solid #ccc;
+  color: #ccc;
+  &.active {
+    border-color: #28f;
+    color: #28f;
+  }
 }
 </style>

@@ -16,6 +16,7 @@ const store = new Vuex.Store({
     chosenDay: new Date(),
     curRecord: {},
     savings: {},
+    isSecret: false,
 
     // 固定项（枚举项）
     enumeration: [],
@@ -61,6 +62,9 @@ const store = new Vuex.Store({
     setSavings(state, savings) {
       console.log("[store/setSavings]", savings)
       state.savings = savings
+    },
+    toggleIsSecret(state) {
+      state.isSecret = !state.isSecret
     },
     insert(state, record) {
       addRecord(table.recordsTable, record).then(res => {

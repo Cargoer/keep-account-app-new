@@ -44,7 +44,6 @@ function baseRequest(url, params = {}, method = 'GET', options = {}) {
 
 // 获取表记录
 export function getTableRecords(tableName, filterByFormula = '') {
-  console.log("getTableRecords!")
   return baseRequest(`/${tableName}`, {
     view: 'Grid view',
     filterByFormula 
@@ -53,7 +52,6 @@ export function getTableRecords(tableName, filterByFormula = '') {
 
 // 添加表记录
 export function addRecord(tableName, fields) {
-  console.log("addRecord worked!")
   return baseRequest(
     `/${tableName}`,
     {
@@ -68,7 +66,6 @@ export function addRecord(tableName, fields) {
 
 // 更改表记录
 export function updateRecord(tableName, id, fields) {
-  console.log("addRecord worked!")
   return baseRequest(
     `/${tableName}`,
     {

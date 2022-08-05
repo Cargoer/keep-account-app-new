@@ -1,5 +1,5 @@
 <template>
-  <view class="daily-records">
+  <view class="daily-records" @touchstart="handleTouchStart" @touchmove="handleTouchMove">
     <view class="top fr">
       <uni-icons type="left" size="24" color="#ccc" @click="shiftDay(-1)"></uni-icons>
       <uni-datetime-picker
@@ -50,6 +50,7 @@ export default {
   data() {
     return {
       dateValue: '',
+      startTouchPos: {}
     }
   },
   components: {
@@ -128,6 +129,18 @@ export default {
       this.dateValue = tempDate.toISOString().split('T')[0]
       console.log("dateValue after shift:", this.dateValue)
       this.queryRecordList(this.dateValue)
+    },
+    handleTouchStart(e) {
+      this.startTouchPos = {...e.changedTouches[0]}
+    },
+    handleTouchMove(e) {
+      let { clientX } = e.touches[0]
+      if(clientX < this.startTouchPos.clientX) {
+        this.shiftDay(1)
+      }
+      if(clientX > this.startTouchPos.clientX) {
+        this.shiftDay(-1)
+      }
     },
 
     toAdd() {

@@ -76,9 +76,8 @@ export default {
       "dailyIncomeTotal"
     ]),
     progressWidth() {
-      let now = new Date(),
-          day = now.getDate(),
-          totalDay = new Date(now.getFullYear(), now.getMonth()+1, 0).getDate()
+      let day = moment().date()
+      let totalDay = moment().daysInMonth()
       let percentage = Number(day / totalDay).toFixed(2)
       return `width: ${Math.floor(550 * percentage)}rpx`
     }

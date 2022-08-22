@@ -1,27 +1,26 @@
 <template>
   <view class="record-list">
-    <view v-for="(item, index) in records" :key="index">
+    <view v-for="(item, index) in dailyRecords" :key="index">
       <view class="record fr" @click="toDetail(item)">
         <view class="typeIcon">{{ item.category[0] }}</view>
         <view class="content" v-if="!isSecret">{{item.content?item.content: item.category}}</view>
-        <view class="content" v-else>***</view>
+        <view class="content" v-else>****</view>
         <view class="amount" v-if="!isSecret">
           {{signOfRecord(item)}}￥{{item.amount}}
         </view>
         <view class="amount" v-else>***</view>
       </view>
-      <!-- <Record :record="item"/> -->
     </view>
-    
   </view>
 </template>
 
 <script>
-import { mapState, mapMutations } from 'vuex'
+import { mapState, mapGetters, mapMutations } from 'vuex'
 
 export default {
   computed: {
     ...mapState(["records", "savings", "isSecret"]),
+    ...mapGetters(["dailyRecords"])
   },
   methods: {
     ...mapMutations(["setCurRecord"]),

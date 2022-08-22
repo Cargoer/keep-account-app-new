@@ -45,12 +45,17 @@ import { mapState, mapGetters, mapMutations } from 'vuex'
 import Tabbar from '@/components/tabbar.vue'
 import { getTableRecords } from '@/api/airtableRequest.js'
 import table from '@/utils/globalConfig.js'
+import moment from 'moment'
 
 export default {
   data() {
     return {
       dateValue: '',
-      startTouchPos: {}
+      startTouchPos: {},
+      monthInfo: {
+        expenseTotalAmt: '--',
+        incomeTotalAmt: '--'
+      }
     }
   },
   components: {
@@ -64,7 +69,11 @@ export default {
       "isSecret"
     ]),
     ...mapGetters([
-      'dailyTotal'
+      "dailyRecords",
+      "monthExpenseTotal",
+      "monthIncomeTotal",
+      "dailyExpenseTotal",
+      "dailyIncomeTotal"
     ]),
     progressWidth() {
       let now = new Date(),
@@ -77,31 +86,30 @@ export default {
   methods: {
     ...mapMutations([
       "setChosenDay", 
-      "setRecords", 
+      "setRecords",
+      "setMonthRecords",
       "setSavings", 
       "toggleIsSecret",
       "initEnumeration",
     ]),
 
-    // 初始化收支记录
-    queryRecordList(date) {
+    // 获取月收支信息
+    queryMonthRecords(month) {
       uni.showLoading({
         title: '加载中'
       })
-      this.setChosenDay(date)
-      
-      let filterFormula = `IS_SAME({createTime}, "${date}") = 1`
+      let filterFormula = `IS_SAME({month}, "${month}") = 1`
       getTableRecords(table.recordsTable, filterFormula)
         .then(res => {
-          console.log("get records res:", res)
-          this.setRecords(res.records.map(item => item.fields))
+          console.log("get month count res:", res)
+          this.setMonthRecords(res.records.map(item => item.fields))
           uni.hideLoading()
         })
         .catch(err => {
-          console.error("get records err:", err)
-          uni.hideLoading()
+          console.error("get month count err:", err)
         })
     },
+
     // 初始化积蓄信息
     querySavings() {
       getTableRecords(table.savingTable)
@@ -117,19 +125,25 @@ export default {
     // 更改日期的三种方式
     onSelectDate(val) {  // 日历选择
       this.dateValue = val
-      this.queryRecordList(val)
+      this.handleDateChange(this.dateValue)
     },
     toToday() {  // 回到今天
-      this.dateValue = new Date().toISOString().split('T')[0]
-      this.queryRecordList(this.dateValue)
+      this.dateValue = moment().format('yyyy-MM-DD')
+      this.handleDateChange(this.dateValue)
     },
     shiftDay(n) {  // 前后增加天数
-      let tempDate = new Date(this.dateValue)
-      tempDate.setDate(tempDate.getDate() + n)
-      this.dateValue = tempDate.toISOString().split('T')[0]
-      console.log("dateValue after shift:", this.dateValue)
-      this.queryRecordList(this.dateValue)
+      this.dateValue = moment(this.dateValue).subtract(n, 'day').format('yyyy-MM-DD')
+      this.handleDateChange(this.dateValue)
     },
+    handleDateChange(newDate) {
+      const chosenMonth = newDate.split('-')[1]
+      if(chosenMonth != this.chosenDay.split('-')[1]) {
+        this.queryMonthRecords(chosenMonth)
+      }
+      this.setChosenDay(newDate)
+    },
+
+    // 滑屏相关
     handleTouchStart(e) {
       this.startTouchPos = {...e.changedTouches[0]}
     },

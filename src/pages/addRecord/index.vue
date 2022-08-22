@@ -8,6 +8,7 @@
     <view class="top-area fr">
       <view class="date-picker-area fr">
         <uni-icons type="calendar" size="40" color="#fff" @click="pickDate"></uni-icons>
+        <view class="date-value">{{ chosenDay }}</view>
         <uni-datetime-picker
           type="date"
           :value="showDate"

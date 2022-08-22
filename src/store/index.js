@@ -9,6 +9,12 @@ import table from '@/utils/globalConfig.js'
 
 Vue.use(Vuex);
 
+const getTotalCondition = ({date1, date2, recordType1, recordType2}) => {
+  let condition = recordType1 === recordType2
+  if(date1 && date2) condition = condition && (date1 === date2)
+  return condition
+}
+
 const store = new Vuex.Store({
   state: {
     // 可变项
@@ -18,18 +24,49 @@ const store = new Vuex.Store({
     savings: {},
     isSecret: false,
 
+    // 月份记录
+    monthRecords: [],
+    // dailyRecords: [],
+
     // 固定项（枚举项）
     enumeration: [],
   },
   getters: {
-    dailyTotal(state) {
-      console.log("records for dailyTotal:", state.records)
-      let total = state.records.reduce((sum, item) => {
-        return sum + (item.recordType == '支出'? -item.amount: item.amount)
-      }, 0)
-      console.log("total:", total)
-      return total
+    dailyRecords(state) {
+      return state.monthRecords.filter(item => {
+        return item.createTime === state.chosenDay
+      })
     },
+    dailyExpenseTotal(state, getters) {
+      return getters.dailyRecords.filter(item => {
+        return item.recordType === '支出'
+      }).reduce((total, item) => {
+        return total + item.amount
+      }, 0)
+    },
+    dailyIncomeTotal(state) {
+      return getters.dailyRecords.filter(item => {
+        return item.recordType === '收入'
+      }).reduce((total, item) => {
+        return total + item.amount
+      }, 0)
+    },
+    monthExpenseTotal(state) {
+      return state.monthRecords.filter(item => {
+        return item.recordType === '支出'
+      }).reduce((total, item) => {
+        return total + item.amount
+      }, 0)
+    },
+    monthIncomeTotal(state) {
+      return state.monthRecords.filter(item => {
+        return item.recordType === '收入'
+      }).reduce((total, item) => {
+        return total + item.amount
+      }, 0)
+    },
+
+    // 各枚举项
     expenseEnumeration(state) {
       return state.enumeration.filter(item => {
         return item.type == 'expense'
@@ -57,6 +94,10 @@ const store = new Vuex.Store({
     },
     setRecords(state, records) {
       console.log("[store/setRecords]", records)
+      state.records = records
+    },
+    setMonthRecords(state, records) {
+      console.log("[store/setMonthRecords]", records)
       state.records = records
     },
     setSavings(state, savings) {
